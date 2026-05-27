@@ -125,38 +125,38 @@ with col_kanan:
     
     with st.expander("🧠 Mengapa AI memberikan persentase tersebut? (Klik untuk detail)"):
     
-    if st.session_state.rr_num < 600:
-        st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (< 600 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu cepat (Takikardia), namun mesin medis mungkin memiliki toleransi klinis tertentu.")
-    elif st.session_state.rr_num > 1000:
-        st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (> 1000 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu lambat (Bradikardia), namun bisa saja wajar pada atlet atau kasus non-akut.")
-    else:
-        st.success(f"**RR Interval ({st.session_state.rr_num} ms) - Normal:** Rentang teori dan batas aman berada di kisaran 600 - 1000 ms.")
-        
-    if qrs_duration > 120:
-        st.error(f"**QRS Duration ({qrs_duration} ms) - Di Luar Batas (> 120 ms):** Normalnya secara teori berkisar di 80 - 120 ms. Angka ini merupakan indikasi hambatan listrik (Bundle Branch Block).")
-    elif qrs_duration < 0:
-        st.error(f"**QRS Duration ({qrs_duration} ms) - Input Tidak Valid:** Titik akhir (End) QRS tidak boleh lebih kecil dari titik awal (Onset).")
-    else:
-        st.success(f"**QRS Duration ({qrs_duration} ms) - Normal:** Waktu bilik memompa sesuai dengan rentang batas aman (< 120 ms).")
-        
-    if p_duration >= 120:
-        st.error(f"**P Duration ({p_duration} ms) - Di Luar Batas (>= 120 ms):** Secara teori kisaran normal adalah < 120 ms. Angka ini merupakan indikasi pembengkakan serambi (Atrial Enlargement).")
-    elif p_duration < 0:
-        st.error(f"**P Duration ({p_duration} ms) - Input Tidak Valid:** Titik akhir (End) P tidak boleh lebih kecil dari titik awal (Onset).")
-    else:
-        st.success(f"**P Duration ({p_duration} ms) - Normal:** Waktu kontraksi serambi sesuai dengan rentang teori medis (< 120 ms).")
-        
-    if not (0 <= st.session_state.pa_num <= 75):
-        st.error(f"**P Axis ({st.session_state.pa_num}°) - Di Luar Batas:** Secara teori berada di 0° hingga 75°. Menyimpang dari ini berpotensi mengindikasikan irama ektopik.")
-    else:
-        st.success(f"**P Axis ({st.session_state.pa_num}°) - Normal:** Aksis serambi berada dalam toleransi klinis (0° hingga 75°).")
-
-    if not (-30 <= st.session_state.qa_num <= 90):
-        st.error(f"**QRS Axis ({st.session_state.qa_num}°) - Di Luar Batas:** Secara teori berada di -30° hingga 90°. Deviasi dari angka ini dapat terkait dengan kelainan anatomi atau konduksi.")
-    else:
-        st.success(f"**QRS Axis ({st.session_state.qa_num}°) - Normal:** Aksis bilik utama berada dalam toleransi klinis (-30° hingga 90°).")
-
-    if not (-15 <= st.session_state.ta_num <= 105):
-        st.error(f"**T Axis ({st.session_state.ta_num}°) - Di Luar Batas:** Secara teori berada di -15° hingga 105°. Deviasi ini sering diwaspadai klinisi untuk potensi iskemia.")
-    else:
-        st.success(f"**T Axis ({st.session_state.ta_num}°) - Normal:** Aksis repolarisasi berada dalam batas toleransi (-15° hingga 105°).")
+        if st.session_state.rr_num < 600:
+            st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (< 600 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu cepat (Takikardia), namun mesin medis mungkin memiliki toleransi klinis tertentu.")
+        elif st.session_state.rr_num > 1000:
+            st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (> 1000 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu lambat (Bradikardia), namun bisa saja wajar pada atlet atau kasus non-akut.")
+        else:
+            st.success(f"**RR Interval ({st.session_state.rr_num} ms) - Normal:** Rentang teori dan batas aman berada di kisaran 600 - 1000 ms.")
+            
+        if qrs_duration > 120:
+            st.error(f"**QRS Duration ({qrs_duration} ms) - Di Luar Batas (> 120 ms):** Normalnya secara teori berkisar di 80 - 120 ms. Angka ini merupakan indikasi hambatan listrik (Bundle Branch Block).")
+        elif qrs_duration < 0:
+            st.error(f"**QRS Duration ({qrs_duration} ms) - Input Tidak Valid:** Titik akhir (End) QRS tidak boleh lebih kecil dari titik awal (Onset).")
+        else:
+            st.success(f"**QRS Duration ({qrs_duration} ms) - Normal:** Waktu bilik memompa sesuai dengan rentang batas aman (< 120 ms).")
+            
+        if p_duration >= 120:
+            st.error(f"**P Duration ({p_duration} ms) - Di Luar Batas (>= 120 ms):** Secara teori kisaran normal adalah < 120 ms. Angka ini merupakan indikasi pembengkakan serambi (Atrial Enlargement).")
+        elif p_duration < 0:
+            st.error(f"**P Duration ({p_duration} ms) - Input Tidak Valid:** Titik akhir (End) P tidak boleh lebih kecil dari titik awal (Onset).")
+        else:
+            st.success(f"**P Duration ({p_duration} ms) - Normal:** Waktu kontraksi serambi sesuai dengan rentang teori medis (< 120 ms).")
+            
+        if not (0 <= st.session_state.pa_num <= 75):
+            st.error(f"**P Axis ({st.session_state.pa_num}°) - Di Luar Batas:** Secara teori berada di 0° hingga 75°. Menyimpang dari ini berpotensi mengindikasikan irama ektopik.")
+        else:
+            st.success(f"**P Axis ({st.session_state.pa_num}°) - Normal:** Aksis serambi berada dalam toleransi klinis (0° hingga 75°).")
+    
+        if not (-30 <= st.session_state.qa_num <= 90):
+            st.error(f"**QRS Axis ({st.session_state.qa_num}°) - Di Luar Batas:** Secara teori berada di -30° hingga 90°. Deviasi dari angka ini dapat terkait dengan kelainan anatomi atau konduksi.")
+        else:
+            st.success(f"**QRS Axis ({st.session_state.qa_num}°) - Normal:** Aksis bilik utama berada dalam toleransi klinis (-30° hingga 90°).")
+    
+        if not (-15 <= st.session_state.ta_num <= 105):
+            st.error(f"**T Axis ({st.session_state.ta_num}°) - Di Luar Batas:** Secara teori berada di -15° hingga 105°. Deviasi ini sering diwaspadai klinisi untuk potensi iskemia.")
+        else:
+            st.success(f"**T Axis ({st.session_state.ta_num}°) - Normal:** Aksis repolarisasi berada dalam batas toleransi (-15° hingga 105°).")
