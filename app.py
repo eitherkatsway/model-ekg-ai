@@ -100,8 +100,8 @@ p_duration = st.session_state.pe_num - st.session_state.po_num
 qrs_duration = st.session_state.qe_num - st.session_state.qo_num
 
 st.divider()
-st.subheader("Kalkulasi Durasi Otomatis (Read-Only)")
-st.caption("Dua kolom ini tidak dapat diisi manual. Nilainya merupakan selisih antara titik akhir (End) dan titik awal (Onset) dari gelombang yang dimasukkan di atas.")
+st.subheader("Kalkulasi Durasi")
+st.caption("Nilainya merupakan selisih antara titik akhir (End) dan titik awal (Onset) dari gelombang yang dimasukkan di atas.")
 
 c_dur1, c_dur2, c_dur3 = st.columns(3)
 c_dur1.metric("P Duration (P End - P Onset)", f"{p_duration} ms", 
@@ -130,8 +130,8 @@ with c_dur3:
     else:
         st.success("✅ PRIORITAS 3 (AMAN)")
 
-st.divider()
 st.subheader(f"Hasil Analisis Triage: Probabilitas Kritis {persen_bahaya:.2f}%")
+st.divider()
 
 with st.expander("🧠 Mengapa AI memberikan persentase tersebut? (Klik untuk detail)"):
     
