@@ -130,7 +130,8 @@ with c_dur3:
     else:
         st.success("✅ PRIORITAS 3 (AMAN)")
 
-st.subheader(f"Hasil Analisis Triage: Probabilitas Kritis {persen_bahaya:.2f}%")
+    st.markdown(f"**Hasil Analisis Triage:** Probabilitas Kritis {persen_bahaya:.2f}%")
+    
 st.divider()
 
 with st.expander("🧠 Mengapa AI memberikan persentase tersebut? (Klik untuk detail)"):
