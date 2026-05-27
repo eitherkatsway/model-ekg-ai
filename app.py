@@ -39,26 +39,36 @@ st.info("Catatan Transparansi Medis: Rentang nilai normal didasarkan pada teori 
 col_kiri, col_tengah, col_kanan = st.columns([1.1, 1.1, 1.4])
 
 with col_kiri:
-    st.subheader("Interval & Gelombang")
+    st.subheader("Interval & Gelombang (ms)")
     
+   # RR Interval dengan Hover Penjelasan
     c1, c2 = st.columns([3, 1])
-    c1.slider("RR Interval", 300, 2000, key='rr_sld', on_change=sync_rr, help="Normal: 600 - 1000 ms.")
+    c1.slider("RR Interval", 300, 2000, key='rr_sld', on_change=sync_rr, 
+              help="Jarak Antar Detak Jantung. Normal: 600 - 1000 ms.")
     c2.number_input("RR", 300, 2000, key='rr_num', on_change=sync_rr_num, label_visibility="collapsed")
     
+    # P Onset
     c1, c2 = st.columns([3, 1])
-    c1.slider("P Onset (Awal P)", 0, 500, key='po_sld', on_change=sync_po)
+    c1.slider("P Onset (Awal P)", 0, 500, key='po_sld', on_change=sync_po, 
+              help="Titik waktu milidetik saat gelombang kontraksi serambi (atrium) dimulai.")
     c2.number_input("P On", 0, 500, key='po_num', on_change=sync_po_num, label_visibility="collapsed")
     
+    # P End
     c1, c2 = st.columns([3, 1])
-    c1.slider("P End (Akhir P)", 0, 500, key='pe_sld', on_change=sync_pe)
+    c1.slider("P End (Akhir P)", 0, 500, key='pe_sld', on_change=sync_pe, 
+              help="Titik waktu milidetik saat gelombang kontraksi serambi (atrium) berakhir.")
     c2.number_input("P End", 0, 500, key='pe_num', on_change=sync_pe_num, label_visibility="collapsed")
     
+    # QRS Onset
     c1, c2 = st.columns([3, 1])
-    c1.slider("QRS Onset (Awal QRS)", 0, 500, key='qo_sld', on_change=sync_qo)
+    c1.slider("QRS Onset (Awal QRS)", 0, 500, key='qo_sld', on_change=sync_qo, 
+              help="Titik waktu milidetik saat bilik (ventrikel) mulai memompa.")
     c2.number_input("QRS On", 0, 500, key='qo_num', on_change=sync_qo_num, label_visibility="collapsed")
     
+    # QRS End
     c1, c2 = st.columns([3, 1])
-    c1.slider("QRS End (Akhir QRS)", 0, 500, key='qe_sld', on_change=sync_qe)
+    c1.slider("QRS End (Akhir QRS)", 0, 500, key='qe_sld', on_change=sync_qe, 
+              help="Titik waktu milidetik saat bilik (ventrikel) selesai memompa.")
     c2.number_input("QRS End", 0, 500, key='qe_num', on_change=sync_qe_num, label_visibility="collapsed")
 
 with col_tengah:
@@ -81,8 +91,10 @@ with col_tengah:
     p_duration = st.session_state.pe_num - st.session_state.po_num
     qrs_duration = st.session_state.qe_num - st.session_state.qo_num
     
-    st.metric("P Duration (P End - P Onset)", f"{p_duration} ms")
-    st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms")
+    st.metric("P Duration (P End - P Onset)", f"{p_duration} ms",
+             help="Durasi kontraksi serambi (atrium) jantung. Normal teori: < 120 ms.")
+    st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms", 
+              help="Durasi kontraksi bilik (ventrikel) jantung. Normal teori: 80 - 120 ms.")
 
 input_data = pd.DataFrame({
     'rr_interval': [st.session_state.rr_num],
@@ -107,44 +119,44 @@ with col_kanan:
         st.success("✅ PRIORITAS 3 (AMAN)")
         
     st.markdown(
-        f"<div style='font-size: 20px; font-weight: bold; margin-bottom: 15px;'>Probabilitas Kritis: {persen_bahaya:.2f}%</div>", 
+        f"<div style='font-size: 30px; font-weight: bold; margin-bottom: 15px;'>Probabilitas Kritis: {persen_bahaya:.2f}%</div>", 
         unsafe_allow_html=True
     )
     
-    st.markdown("**Analisis Keputusan Medis:**")
+    with st.expander("🧠 Mengapa AI memberikan persentase tersebut? (Klik untuk detail)"):
     
     if st.session_state.rr_num < 600:
-        st.error(f"**RR ({st.session_state.rr_num} ms):** < 600 ms. Indikasi Takikardia.")
+        st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (< 600 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu cepat (Takikardia), namun mesin medis mungkin memiliki toleransi klinis tertentu.")
     elif st.session_state.rr_num > 1000:
-        st.error(f"**RR ({st.session_state.rr_num} ms):** > 1000 ms. Indikasi Bradikardia.")
+        st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Di Luar Batas (> 1000 ms):** Secara teori, normal berkisar di 600 - 1000 ms. Angka ini terlalu lambat (Bradikardia), namun bisa saja wajar pada atlet atau kasus non-akut.")
     else:
-        st.success(f"**RR ({st.session_state.rr_num} ms):** Normal.")
+        st.success(f"**RR Interval ({st.session_state.rr_num} ms) - Normal:** Rentang teori dan batas aman berada di kisaran 600 - 1000 ms.")
         
     if qrs_duration > 120:
-        st.error(f"**QRS ({qrs_duration} ms):** > 120 ms. Indikasi Bundle Branch Block.")
+        st.error(f"**QRS Duration ({qrs_duration} ms) - Di Luar Batas (> 120 ms):** Normalnya secara teori berkisar di 80 - 120 ms. Angka ini merupakan indikasi hambatan listrik (Bundle Branch Block).")
     elif qrs_duration < 0:
-        st.error(f"**QRS ({qrs_duration} ms):** Input tidak valid.")
+        st.error(f"**QRS Duration ({qrs_duration} ms) - Input Tidak Valid:** Titik akhir (End) QRS tidak boleh lebih kecil dari titik awal (Onset).")
     else:
-        st.success(f"**QRS ({qrs_duration} ms):** Normal.")
+        st.success(f"**QRS Duration ({qrs_duration} ms) - Normal:** Waktu bilik memompa sesuai dengan rentang batas aman (< 120 ms).")
         
     if p_duration >= 120:
-        st.error(f"**P Dur ({p_duration} ms):** >= 120 ms. Indikasi Atrial Enlargement.")
+        st.error(f"**P Duration ({p_duration} ms) - Di Luar Batas (>= 120 ms):** Secara teori kisaran normal adalah < 120 ms. Angka ini merupakan indikasi pembengkakan serambi (Atrial Enlargement).")
     elif p_duration < 0:
-        st.error(f"**P Dur ({p_duration} ms):** Input tidak valid.")
+        st.error(f"**P Duration ({p_duration} ms) - Input Tidak Valid:** Titik akhir (End) P tidak boleh lebih kecil dari titik awal (Onset).")
     else:
-        st.success(f"**P Dur ({p_duration} ms):** Normal.")
+        st.success(f"**P Duration ({p_duration} ms) - Normal:** Waktu kontraksi serambi sesuai dengan rentang teori medis (< 120 ms).")
         
     if not (0 <= st.session_state.pa_num <= 75):
-        st.error(f"**P Ax ({st.session_state.pa_num}°):** Di luar batas (0° s.d 75°).")
+        st.error(f"**P Axis ({st.session_state.pa_num}°) - Di Luar Batas:** Secara teori berada di 0° hingga 75°. Menyimpang dari ini berpotensi mengindikasikan irama ektopik.")
     else:
-        st.success(f"**P Ax ({st.session_state.pa_num}°):** Normal.")
+        st.success(f"**P Axis ({st.session_state.pa_num}°) - Normal:** Aksis serambi berada dalam toleransi klinis (0° hingga 75°).")
 
     if not (-30 <= st.session_state.qa_num <= 90):
-        st.error(f"**QRS Ax ({st.session_state.qa_num}°):** Di luar batas (-30° s.d 90°).")
+        st.error(f"**QRS Axis ({st.session_state.qa_num}°) - Di Luar Batas:** Secara teori berada di -30° hingga 90°. Deviasi dari angka ini dapat terkait dengan kelainan anatomi atau konduksi.")
     else:
-        st.success(f"**QRS Ax ({st.session_state.qa_num}°):** Normal.")
+        st.success(f"**QRS Axis ({st.session_state.qa_num}°) - Normal:** Aksis bilik utama berada dalam toleransi klinis (-30° hingga 90°).")
 
     if not (-15 <= st.session_state.ta_num <= 105):
-        st.error(f"**T Ax ({st.session_state.ta_num}°):** Di luar batas (-15° s.d 105°).")
+        st.error(f"**T Axis ({st.session_state.ta_num}°) - Di Luar Batas:** Secara teori berada di -15° hingga 105°. Deviasi ini sering diwaspadai klinisi untuk potensi iskemia.")
     else:
-        st.success(f"**T Ax ({st.session_state.ta_num}°):** Normal.")
+        st.success(f"**T Axis ({st.session_state.ta_num}°) - Normal:** Aksis repolarisasi berada dalam batas toleransi (-15° hingga 105°).")
