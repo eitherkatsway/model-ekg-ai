@@ -115,4 +115,36 @@ with col_kanan:
     
     if st.session_state.rr_num < 600:
         st.error(f"**RR ({st.session_state.rr_num} ms):** < 600 ms. Indikasi Takikardia.")
-    elif
+    elif st.session_state.rr_num > 1000:
+        st.error(f"**RR ({st.session_state.rr_num} ms):** > 1000 ms. Indikasi Bradikardia.")
+    else:
+        st.success(f"**RR ({st.session_state.rr_num} ms):** Normal.")
+        
+    if qrs_duration > 120:
+        st.error(f"**QRS ({qrs_duration} ms):** > 120 ms. Indikasi Bundle Branch Block.")
+    elif qrs_duration < 0:
+        st.error(f"**QRS ({qrs_duration} ms):** Input tidak valid.")
+    else:
+        st.success(f"**QRS ({qrs_duration} ms):** Normal.")
+        
+    if p_duration >= 120:
+        st.error(f"**P Dur ({p_duration} ms):** >= 120 ms. Indikasi Atrial Enlargement.")
+    elif p_duration < 0:
+        st.error(f"**P Dur ({p_duration} ms):** Input tidak valid.")
+    else:
+        st.success(f"**P Dur ({p_duration} ms):** Normal.")
+        
+    if not (0 <= st.session_state.pa_num <= 75):
+        st.error(f"**P Ax ({st.session_state.pa_num}°):** Di luar batas (0° s.d 75°).")
+    else:
+        st.success(f"**P Ax ({st.session_state.pa_num}°):** Normal.")
+
+    if not (-30 <= st.session_state.qa_num <= 90):
+        st.error(f"**QRS Ax ({st.session_state.qa_num}°):** Di luar batas (-30° s.d 90°).")
+    else:
+        st.success(f"**QRS Ax ({st.session_state.qa_num}°):** Normal.")
+
+    if not (-15 <= st.session_state.ta_num <= 105):
+        st.error(f"**T Ax ({st.session_state.ta_num}°):** Di luar batas (-15° s.d 105°).")
+    else:
+        st.success(f"**T Ax ({st.session_state.ta_num}°):** Normal.")
