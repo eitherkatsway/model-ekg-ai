@@ -10,7 +10,7 @@ def load_model():
 
 model = load_model()
 
-st.title("Sistem Deteksi Anomali EKG Real-Time")
+st.title("Sistem Deteksi Anomali Irama Jantung")
 st.write("Geser slider di bawah ini untuk melihat prediksi sistem secara instan.")
 st.divider()
 
