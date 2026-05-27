@@ -42,7 +42,7 @@ persen_bahaya = probabilitas[1] * 100
 with col3:
     st.subheader("Hasil Analisis")
     st.metric("Probabilitas Kritis", f"{persen_bahaya:.2f}%")
-    
+
     if persen_bahaya > 75:
         st.error("PRIORITAS 1 (KRITIS)")
     elif persen_bahaya > 40:
