@@ -123,55 +123,40 @@ with col_right:
         unsafe_allow_html=True
     )
 
-   with st.expander("🧠 Why did the AI give this percentage? (Click for details)"):
-        
-        univariate_anomaly = False
-        
+    with st.expander("🧠 Why did the AI give this percentage? (Click for details)"):
+
         if st.session_state.rr_num < 600:
             st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Out of Bounds (< 600 ms):** Theoretically, normal ranges from 600 - 1000 ms. This rate is too fast, possibly indicating Tachycardia.")
-            univariate_anomaly = True
         elif st.session_state.rr_num > 1000:
             st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Out of Bounds (> 1000 ms):** Theoretically, normal ranges from 600 - 1000 ms. This rate is too slow, possibly indicating Bradycardia.")
-            univariate_anomaly = True
         else:
             st.success(f"**RR Interval ({st.session_state.rr_num} ms) - Normal:** Falls within the theoretical and safe range of 600 - 1000 ms.")
 
         if qrs_duration > 120:
             st.error(f"**QRS Duration ({qrs_duration} ms) - Out of Bounds (> 120 ms):** Theoretical normal ranges from 80 - 120 ms. This value indicates a possible electrical conduction block (Bundle Branch Block).")
-            univariate_anomaly = True
         elif qrs_duration < 0:
             st.error(f"**QRS Duration ({qrs_duration} ms) - Invalid Input:** QRS End cannot be smaller than QRS Onset.")
-            univariate_anomaly = True
         else:
             st.success(f"**QRS Duration ({qrs_duration} ms) - Normal:** Ventricular pumping time is within safe limits (< 120 ms).")
 
         if p_duration >= 120:
             st.error(f"**P Duration ({p_duration} ms) - Out of Bounds (>= 120 ms):** Theoretical normal range is < 120 ms. This value indicates possible Atrial Enlargement.")
-            univariate_anomaly = True
         elif p_duration < 0:
             st.error(f"**P Duration ({p_duration} ms) - Invalid Input:** P End cannot be smaller than P Onset.")
-            univariate_anomaly = True
         else:
             st.success(f"**P Duration ({p_duration} ms) - Normal:** Atrial contraction time matches theoretical medical ranges (< 120 ms).")
 
         if not (0 <= st.session_state.pa_num <= 75):
             st.error(f"**P Axis ({st.session_state.pa_num}°) - Out of Bounds:** Theoretically falls between 0° and 75°. Deviation from this may indicate an ectopic rhythm.")
-            univariate_anomaly = True
         else:
             st.success(f"**P Axis ({st.session_state.pa_num}°) - Normal:** Atrial axis is within clinical tolerance (0° to 75°).")
 
         if not (-30 <= st.session_state.qa_num <= 90):
             st.error(f"**QRS Axis ({st.session_state.qa_num}°) - Out of Bounds:** Theoretically falls between -30° and 90°. Deviation may be related to anatomical or conduction abnormalities.")
-            univariate_anomaly = True
         else:
             st.success(f"**QRS Axis ({st.session_state.qa_num}°) - Normal:** Main ventricular axis is within clinical tolerance (-30° to 90°).")
 
         if not (-15 <= st.session_state.ta_num <= 105):
             st.error(f"**T Axis ({st.session_state.ta_num}°) - Out of Bounds:** Theoretically falls between -15° and 105°. This deviation is often monitored by clinicians for potential ischemia.")
-            univariate_anomaly = True
         else:
             st.success(f"**T Axis ({st.session_state.ta_num}°) - Normal:** Repolarization axis is within tolerance limits (-15° to 105°).")
-
-        # Logika Pendeteksi Multivariate Interaction
-        if persen_bahaya > 40 and not univariate_anomaly:
-            st.warning("**Multivariate Interaction Detected:** All individual metrics appear to be within normal theoretical ranges. However, the AI detected an anomalous pattern based on the *combination* of these specific values, which historically correlates with abnormal ECG reports in the training data.")
