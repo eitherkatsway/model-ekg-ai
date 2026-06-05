@@ -163,9 +163,11 @@ with col_right:
                 st.info(f"➖ **{feature}** (Value: {actual_val}): Neutral impact on this specific prediction.")
 
         fig, ax = plt.subplots(figsize=(6, 4))
-        colors = ['#ff4b4b' if x > 0 else '#00cc96' for x in shap_df['SHAP Value']]
         
         shap_df_plot = shap_df.sort_values(by='Abs_SHAP', ascending=True)
+        
+        colors = ['#ff4b4b' if x > 0 else '#00cc96' for x in shap_df_plot['SHAP Value']]
+        
         ax.barh(shap_df_plot['Feature'], shap_df_plot['SHAP Value'], color=colors)
         
         ax.set_xlabel("Impact on Risk Probability (SHAP Value)")
