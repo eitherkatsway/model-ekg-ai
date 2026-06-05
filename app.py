@@ -123,12 +123,6 @@ with col_right:
             shap_vals_anomaly = shap_vals[0, :, 1]
         else:
             shap_vals_anomaly = shap_vals[0]
-
-        shap_df = pd.DataFrame({
-            'Feature': input_data.columns,
-            'SHAP Value': shap_vals_anomaly,
-            'Actual Value': input_data.iloc[0].values
-        })
         
         shap_df = pd.DataFrame({
             'Feature': input_data.columns,
@@ -138,21 +132,22 @@ with col_right:
         
         shap_df['Original_Index'] = shap_df.index
         shap_df['Abs_SHAP'] = shap_df['SHAP Value'].abs()
+        shap_df = shap_df.sort_values(by=['Impact_Category', 'Abs_SHAP'], ascending=[True, False])
 
-        def categorize_impact(val):
-            if val > 0.01:
-                return 1
-            elif val < -0.01:
-                return 2
-            else:
-                return 3
+        # def categorize_impact(val):
+        #     if val > 0.01:
+        #         return 1
+        #     elif val < -0.01:
+        #         return 2
+        #     else:
+        #         return 3
                 
-        shap_df['Impact_Category'] = shap_df['SHAP Value'].apply(categorize_impact)
+        # shap_df['Impact_Category'] = shap_df['SHAP Value'].apply(categorize_impact)
 
-        if (shap_df['Impact_Category'] == 1).any():
-            shap_df = shap_df.sort_values(by=['Impact_Category', 'Abs_SHAP'], ascending=[True, False])
-        else:
-            shap_df = shap_df.sort_values(by='Original_Index')
+        # if (shap_df['Impact_Category'] == 1).any():
+        #     shap_df = shap_df.sort_values(by=['Impact_Category', 'Abs_SHAP'], ascending=[True, False])
+        # else:
+        #     shap_df = shap_df.sort_values(by='Original_Index')
 
         st.markdown("### Top Factors Driving This Prediction")
         
