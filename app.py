@@ -86,7 +86,6 @@ with col_center:
     st.metric("P Duration (P End - P Onset)", f"{p_duration} ms", help="Duration of atrial contraction. Theoretical normal: < 120 ms.")
     st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms", help="Duration of ventricular contraction. Theoretical normal: 80 - 120 ms.")
 
-# INILAH LETAK PERBAIKANNYA: URUTAN KOLOM DISAMAKAN PERSIS DENGAN df.describe() DATA LATIH
 input_data = pd.DataFrame({
     'rr_interval': [st.session_state.rr_num],
     'p_axis': [st.session_state.pa_num],
@@ -131,8 +130,29 @@ with col_right:
             'Actual Value': input_data.iloc[0].values
         })
         
+        shap_df = pd.DataFrame({
+            'Feature': input_data.columns,
+            'SHAP Value': shap_vals_anomaly,
+            'Actual Value': input_data.iloc[0].values
+        })
+        
+        shap_df['Original_Index'] = shap_df.index
         shap_df['Abs_SHAP'] = shap_df['SHAP Value'].abs()
-        shap_df = shap_df.sort_values(by='Abs_SHAP', ascending=False)
+
+        def categorize_impact(val):
+            if val > 0.01:
+                return 1
+            elif val < -0.01:
+                return 2
+            else:
+                return 3
+                
+        shap_df['Impact_Category'] = shap_df['SHAP Value'].apply(categorize_impact)
+
+        if (shap_df['Impact_Category'] == 1).any():
+            shap_df = shap_df.sort_values(by=['Impact_Category', 'Abs_SHAP'], ascending=[True, False])
+        else:
+            shap_df = shap_df.sort_values(by='Original_Index')
 
         st.markdown("### Top Factors Driving This Prediction")
         
