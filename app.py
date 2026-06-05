@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import shap
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="ECG Heart Triage", layout="wide")
 
@@ -84,13 +86,14 @@ with col_center:
     st.metric("P Duration (P End - P Onset)", f"{p_duration} ms", help="Duration of atrial contraction. Theoretical normal: < 120 ms.")
     st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms", help="Duration of ventricular contraction. Theoretical normal: 80 - 120 ms.")
 
+# INILAH LETAK PERBAIKANNYA: URUTAN KOLOM DISAMAKAN PERSIS DENGAN df.describe() DATA LATIH
 input_data = pd.DataFrame({
     'rr_interval': [st.session_state.rr_num],
-    'p_duration': [p_duration],
-    'qrs_duration': [qrs_duration],
     'p_axis': [st.session_state.pa_num],
     'qrs_axis': [st.session_state.qa_num],
-    't_axis': [st.session_state.ta_num]
+    't_axis': [st.session_state.ta_num],
+    'p_duration': [p_duration],
+    'qrs_duration': [qrs_duration]
 })
 
 probabilitas = model.predict_proba(input_data)[0]
