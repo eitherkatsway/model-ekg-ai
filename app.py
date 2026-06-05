@@ -41,34 +41,24 @@ col_left, col_center, col_right = st.columns([1.1, 1.1, 1.4])
 with col_left:
     st.subheader("Intervals & Waves (ms)")
 
-    # RR Interval
     c1, c2 = st.columns([3, 1])
-    c1.slider("RR Interval", 300, 2000, key='rr_sld', on_change=sync_rr,
-              help="Distance between heartbeats. Normal: 600 - 1000 ms.")
+    c1.slider("RR Interval", 300, 2000, key='rr_sld', on_change=sync_rr, help="Distance between heartbeats. Normal: 600 - 1000 ms.")
     c2.number_input("RR", 300, 2000, key='rr_num', on_change=sync_rr_num, label_visibility="collapsed")
 
-    # P Onset
     c1, c2 = st.columns([3, 1])
-    c1.slider("P Onset", 0, 500, key='po_sld', on_change=sync_po,
-              help="Time point in milliseconds when the atrial contraction wave begins.")
+    c1.slider("P Onset", 0, 500, key='po_sld', on_change=sync_po, help="Time point in milliseconds when the atrial contraction wave begins.")
     c2.number_input("P On", 0, 500, key='po_num', on_change=sync_po_num, label_visibility="collapsed")
 
-    # P End
     c1, c2 = st.columns([3, 1])
-    c1.slider("P End", 0, 500, key='pe_sld', on_change=sync_pe,
-              help="Time point in milliseconds when the atrial contraction wave ends.")
+    c1.slider("P End", 0, 500, key='pe_sld', on_change=sync_pe, help="Time point in milliseconds when the atrial contraction wave ends.")
     c2.number_input("P End", 0, 500, key='pe_num', on_change=sync_pe_num, label_visibility="collapsed")
 
-    # QRS Onset
     c1, c2 = st.columns([3, 1])
-    c1.slider("QRS Onset", 0, 500, key='qo_sld', on_change=sync_qo,
-              help="Time point in milliseconds when the ventricles begin to contract.")
+    c1.slider("QRS Onset", 0, 500, key='qo_sld', on_change=sync_qo, help="Time point in milliseconds when the ventricles begin to contract.")
     c2.number_input("QRS On", 0, 500, key='qo_num', on_change=sync_qo_num, label_visibility="collapsed")
 
-    # QRS End
     c1, c2 = st.columns([3, 1])
-    c1.slider("QRS End", 0, 500, key='qe_sld', on_change=sync_qe,
-              help="Time point in milliseconds when the ventricles finish contracting.")
+    c1.slider("QRS End", 0, 500, key='qe_sld', on_change=sync_qe, help="Time point in milliseconds when the ventricles finish contracting.")
     c2.number_input("QRS End", 0, 500, key='qe_num', on_change=sync_qe_num, label_visibility="collapsed")
 
 with col_center:
@@ -91,15 +81,13 @@ with col_center:
     p_duration = st.session_state.pe_num - st.session_state.po_num
     qrs_duration = st.session_state.qe_num - st.session_state.qo_num
 
-    st.metric("P Duration (P End - P Onset)", f"{p_duration} ms",
-             help="Duration of atrial contraction. Theoretical normal: < 120 ms.")
-    st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms",
-              help="Duration of ventricular contraction. Theoretical normal: 80 - 120 ms.")
+    st.metric("P Duration (P End - P Onset)", f"{p_duration} ms", help="Duration of atrial contraction. Theoretical normal: < 120 ms.")
+    st.metric("QRS Duration (QRS End - QRS Onset)", f"{qrs_duration} ms", help="Duration of ventricular contraction. Theoretical normal: 80 - 120 ms.")
 
 input_data = pd.DataFrame({
     'rr_interval': [st.session_state.rr_num],
-    'qrs_duration': [qrs_duration],
     'p_duration': [p_duration],
+    'qrs_duration': [qrs_duration],
     'p_axis': [st.session_state.pa_num],
     'qrs_axis': [st.session_state.qa_num],
     't_axis': [st.session_state.ta_num]
@@ -111,67 +99,60 @@ persen_bahaya = probabilitas[1] * 100
 with col_right:
     st.subheader("AI Triage Results")
 
-    if persen_bahaya > 75:
+    if persen_bahaya > 70:
         st.error("🚨 PRIORITY 1 (CRITICAL)")
-    elif persen_bahaya > 40:
-        st.warning("⚠️ PRIORITY 2 (WARNING)")
+    elif persen_bahaya >= 30:
+        st.warning("⚠️ PRIORITY 2 (CAUTION)")
     else:
-        st.success("✅ PRIORITY 3 (SAFE)")
+        st.success("✅ PRIORITY 3 (NORMAL)")
 
     st.markdown(
         f"<div style='font-size: 30px; font-weight: bold; margin-bottom: 15px;'>Critical Probability: {persen_bahaya:.2f}%</div>",
         unsafe_allow_html=True
     )
 
-    with st.expander("🧠 Why did the AI give this percentage? (Click for details)"):
+    with st.expander("🧠 Explainable AI: Feature Impact Analysis"):
+        explainer = shap.TreeExplainer(model)
+        shap_vals = explainer.shap_values(input_data)
+
+        if isinstance(shap_vals, list):
+            shap_vals_anomaly = shap_vals[1][0]
+        elif len(shap_vals.shape) == 3:
+            shap_vals_anomaly = shap_vals[0, :, 1]
+        else:
+            shap_vals_anomaly = shap_vals[0]
+
+        shap_df = pd.DataFrame({
+            'Feature': input_data.columns,
+            'SHAP Value': shap_vals_anomaly,
+            'Actual Value': input_data.iloc[0].values
+        })
         
-        univariate_anomaly = False
+        shap_df['Abs_SHAP'] = shap_df['SHAP Value'].abs()
+        shap_df = shap_df.sort_values(by='Abs_SHAP', ascending=False)
+
+        st.markdown("### Top Factors Driving This Prediction")
         
-        if st.session_state.rr_num < 600:
-            st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Out of Bounds (< 600 ms):** Theoretically, normal ranges from 600 - 1000 ms. This rate is too fast, possibly indicating Tachycardia.")
-            univariate_anomaly = True
-        elif st.session_state.rr_num > 1000:
-            st.error(f"**RR Interval ({st.session_state.rr_num} ms) - Out of Bounds (> 1000 ms):** Theoretically, normal ranges from 600 - 1000 ms. This rate is too slow, possibly indicating Bradycardia.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**RR Interval ({st.session_state.rr_num} ms) - Normal:** Falls within the theoretical and safe range of 600 - 1000 ms.")
+        for index, row in shap_df.iterrows():
+            feature = row['Feature']
+            shap_val = row['SHAP Value']
+            actual_val = row['Actual Value']
 
-        if qrs_duration > 120:
-            st.error(f"**QRS Duration ({qrs_duration} ms) - Out of Bounds (> 120 ms):** Theoretical normal ranges from 80 - 120 ms. This value indicates a possible electrical conduction block (Bundle Branch Block).")
-            univariate_anomaly = True
-        elif qrs_duration < 0:
-            st.error(f"**QRS Duration ({qrs_duration} ms) - Invalid Input:** QRS End cannot be smaller than QRS Onset.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**QRS Duration ({qrs_duration} ms) - Normal:** Ventricular pumping time is within safe limits (< 120 ms).")
+            if shap_val > 0.01:
+                st.error(f"⬆️ **{feature}** (Value: {actual_val}): Increased the probability of anomaly.")
+            elif shap_val < -0.01:
+                st.success(f"⬇️ **{feature}** (Value: {actual_val}): Decreased the probability of anomaly.")
+            else:
+                st.info(f"➖ **{feature}** (Value: {actual_val}): Neutral impact on this specific prediction.")
 
-        if p_duration >= 120:
-            st.error(f"**P Duration ({p_duration} ms) - Out of Bounds (>= 120 ms):** Theoretical normal range is < 120 ms. This value indicates possible Atrial Enlargement.")
-            univariate_anomaly = True
-        elif p_duration < 0:
-            st.error(f"**P Duration ({p_duration} ms) - Invalid Input:** P End cannot be smaller than P Onset.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**P Duration ({p_duration} ms) - Normal:** Atrial contraction time matches theoretical medical ranges (< 120 ms).")
-
-        if not (0 <= st.session_state.pa_num <= 75):
-            st.error(f"**P Axis ({st.session_state.pa_num}°) - Out of Bounds:** Theoretically falls between 0° and 75°. Deviation from this may indicate an ectopic rhythm.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**P Axis ({st.session_state.pa_num}°) - Normal:** Atrial axis is within clinical tolerance (0° to 75°).")
-
-        if not (-30 <= st.session_state.qa_num <= 90):
-            st.error(f"**QRS Axis ({st.session_state.qa_num}°) - Out of Bounds:** Theoretically falls between -30° and 90°. Deviation may be related to anatomical or conduction abnormalities.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**QRS Axis ({st.session_state.qa_num}°) - Normal:** Main ventricular axis is within clinical tolerance (-30° to 90°).")
-
-        if not (-15 <= st.session_state.ta_num <= 105):
-            st.error(f"**T Axis ({st.session_state.ta_num}°) - Out of Bounds:** Theoretically falls between -15° and 105°. This deviation is often monitored by clinicians for potential ischemia.")
-            univariate_anomaly = True
-        else:
-            st.success(f"**T Axis ({st.session_state.ta_num}°) - Normal:** Repolarization axis is within tolerance limits (-15° to 105°).")
-
-        # Logika Pendeteksi Multivariate Interaction
-        if persen_bahaya > 40 and not univariate_anomaly:
-            st.warning("**Multivariate Interaction Detected:** All individual metrics appear to be within normal theoretical ranges. However, the AI detected an anomalous pattern based on the *combination* of these specific values, which historically correlates with abnormal ECG reports in the training data.")
+        fig, ax = plt.subplots(figsize=(6, 4))
+        colors = ['#ff4b4b' if x > 0 else '#00cc96' for x in shap_df['SHAP Value']]
+        
+        shap_df_plot = shap_df.sort_values(by='Abs_SHAP', ascending=True)
+        ax.barh(shap_df_plot['Feature'], shap_df_plot['SHAP Value'], color=colors)
+        
+        ax.set_xlabel("Impact on Risk Probability (SHAP Value)")
+        ax.set_title("Local Feature Importance")
+        ax.axvline(0, color='black', linewidth=0.8)
+        
+        st.pyplot(fig)
