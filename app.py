@@ -101,9 +101,10 @@ persen_bahaya = probabilitas[1] * 100
 with col_right:
     st.subheader("AI Triage Results")
 
-    if persen_bahaya > 70:
+    # --- PERUBAHAN THRESHOLD BERDASARKAN HASIL CLUSTERING K-MEANS ---
+    if persen_bahaya > 67.71:
         st.error("🚨 PRIORITY 1 (CRITICAL)")
-    elif persen_bahaya >= 30:
+    elif persen_bahaya >= 24.73:
         st.warning("⚠️ PRIORITY 2 (CAUTION)")
     else:
         st.success("✅ PRIORITY 3 (NORMAL)")
@@ -123,13 +124,13 @@ with col_right:
             shap_vals_anomaly = shap_vals[0, :, 1]
         else:
             shap_vals_anomaly = shap_vals[0]
-        
+
         shap_df = pd.DataFrame({
             'Feature': input_data.columns,
             'SHAP Value': shap_vals_anomaly,
             'Actual Value': input_data.iloc[0].values
         })
-        
+
         shap_df['Original_Index'] = shap_df.index
         shap_df['Abs_SHAP'] = shap_df['SHAP Value'].abs()
 
@@ -140,7 +141,7 @@ with col_right:
                 return 2
             else:
                 return 3
-                
+
         shap_df['Impact_Category'] = shap_df['SHAP Value'].apply(categorize_impact)
 
         if (shap_df['Impact_Category'] == 1).any():
@@ -149,7 +150,7 @@ with col_right:
             shap_df = shap_df.sort_values(by='Original_Index')
 
         st.markdown("### Top Factors Driving This Prediction")
-        
+
         for index, row in shap_df.iterrows():
             feature = row['Feature']
             shap_val = row['SHAP Value']
@@ -163,15 +164,15 @@ with col_right:
                 st.info(f"➖ **{feature}** (Value: {actual_val}): Neutral impact on this specific prediction.")
 
         fig, ax = plt.subplots(figsize=(6, 4))
-        
+
         shap_df_plot = shap_df.sort_values(by='Abs_SHAP', ascending=True)
-        
+
         colors = ['#ff4b4b' if x > 0 else '#00cc96' for x in shap_df_plot['SHAP Value']]
-        
+
         ax.barh(shap_df_plot['Feature'], shap_df_plot['SHAP Value'], color=colors)
-        
+
         ax.set_xlabel("Impact on Risk Probability (SHAP Value)")
         ax.set_title("Local Feature Importance")
         ax.axvline(0, color='black', linewidth=0.8)
-        
+
         st.pyplot(fig)
