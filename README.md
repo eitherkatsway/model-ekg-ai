@@ -33,3 +33,5 @@ If you wish to run the system on your local machine, follow these steps:
 
 ## Ethical Statement
 This system functions strictly as a **Decision Support System (DSS)**. It is intended to assist, not replace, clinical judgment. The final authority in patient diagnosis remains exclusively with the healthcare professional.
+
+Developed by: Katrina G. Kwok, Aliya Z. Nurazizah, Aulia F. Mumtaza
