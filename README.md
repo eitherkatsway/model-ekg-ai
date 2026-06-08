@@ -19,5 +19,17 @@ This project utilizes the **MIMIC-IV Clinical Database**. All data processing is
 3. **Thresholding:** K-Means driven triage boundaries (24.73% & 67.71%).
 4. **Dashboard:** Real-time assessment via Streamlit.
 
+## How to Run
+
+### Option 1: Live Demo (Recommended)
+Access the application directly via Streamlit Cloud: 
+https://model-ai-electrocardiogram-anomalityprediction.streamlit.app/
+
+### Option 2: Run Locally
+If you wish to run the system on your local machine, follow these steps:
+1. **Clone this repository**
+2. **Install dependencies**: `pip install -r requirements.txt`
+3. **Launch the application**: `streamlit run app.py`
+
 ## Ethical Statement
 This system functions strictly as a **Decision Support System (DSS)**. It is intended to assist, not replace, clinical judgment. The final authority in patient diagnosis remains exclusively with the healthcare professional.
