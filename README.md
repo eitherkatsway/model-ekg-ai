@@ -2,22 +2,22 @@
 
 An intelligent clinical decision support system designed to assist medical professionals in prioritizing ECG readings. This system utilizes an XGBoost model to classify cardiac anomalies and incorporates Explainable AI (SHAP) to provide diagnostic transparency.
 
-## Key Features
+## Clinical Value
 - **Intelligent Triage:** Classifies ECG data into *Normal*, *Caution*, and *Critical* based on data-driven thresholds (K-Means Clustering).
-- **Explainable AI:** Uses SHAP to provide local feature importance, allowing clinicians to validate AI reasoning.
-- **Guardrails:** Integrated input validation and physiological constraints to ensure reliable and medically sound inferences.
-- **Web Interface:** Deployed using Streamlit for real-time clinical assessment.
+- **Explainable AI:** Uses SHAP to provide local feature importance, allowing clinicians to validate AI reasoning against clinical guidelines.
+- **System Guardrails:**
+  - **Input Validation:** Restricts input data to physiological ranges to prevent processing of sensor artifacts.
+  - **Logical Clipping:** Applies medical constraints (e.g., RR-interval limits) to ensure model inputs are medically sound.
+  - **Transparency Layer:** Prevents "black-box" decision-making by making the system to output feature-level justifications for every triage result.
+
+## Data Source
+This project utilizes the **MIMIC-IV Clinical Database**. All data processing is performed in compliance with clinical privacy standards, and the system is designed to handle de-identified data in secure hospital environments.
 
 ## Architecture
-1. **Feature Engineering:** Derived clinical metrics (P-duration, QRS-duration) from raw ECG time-series.
-2. **Model:** XGBoost Classifier (0.83 Recall).
+1. **Feature Engineering:** Derived clinical metrics (P-duration, QRS-duration) from raw ECG signals.
+2. **Predictive Engine:** XGBoost Classifier (0.83 Recall).
 3. **Thresholding:** K-Means driven triage boundaries (24.73% & 67.71%).
-4. **Explanation:** SHAP TreeExplainer.
+4. **Dashboard:** Real-time assessment via Streamlit.
 
-## How to Run
-1. Clone this repository.
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the application: `streamlit run app.py`
-
-## Ethical Considerations
-This system acts as a **Decision Support System**. All clinical decisions remain the responsibility of the medical professional.
+## Ethical Statement
+This system functions strictly as a **Decision Support System (DSS)**. It is intended to assist, not replace, clinical judgment. The final authority in patient diagnosis remains exclusively with the healthcare professional.
